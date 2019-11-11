@@ -1,3 +1,5 @@
+%function [tform,this_boundary,sfactor] = Defineareaofinterest_thisfile(thisfile,thisfile_2)
+
 thisfile = 'F:/Brain paper slide scans/AD/703424.svs'; %Base image
 thisfile_2 = 'F:/Brain paper slide scans/AD/703303.svs'; %Neighbouring image
 
@@ -55,6 +57,7 @@ else
 end
 
 %Now create the Similarity based 2d transformation matrix between the two images
+[optimizer, metric] = imregconfig('multimodal');
 tform = imregtform(rgb2gray(downsampled_image_2), rgb2gray(downsampled_image), 'similarity', optimizer, metric,'DisplayOptimization',false);
 moved_image = imwarp(downsampled_image_2,tform,'OutputView',imref2d(size(downsampled_image)));
 
@@ -129,7 +132,7 @@ end
 saveas(movedfig,['./output_boundaries/' thisfile_2_name '_moved.jpg'],'jpg');
 
 if numel(this_boundary) ~= 1
-    warning(['More than one boundary element found for slide ' thisfile ' please check the raw image')
+    warning(['More than one boundary element found for slide ' thisfile ' please check the raw image'])
 end    
 
 %Now remove white space areas from within sulci

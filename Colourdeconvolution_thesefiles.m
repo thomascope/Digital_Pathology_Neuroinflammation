@@ -3,21 +3,17 @@
 thisfile = 'F:/Brain paper slide scans/AD/703424.svs'; %Base image
 thisfile_2 = 'F:/Brain paper slide scans/AD/703303.svs'; %Neighbouring image
 
+show_images = 1; %Show images for quality check?
+
 % alternative set of standard values (HDAB from Fiji)
 He = [ 0.6500286;  0.704031;    0.2860126 ];
 DAB = [ 0.26814753;  0.57031375;  0.77642715];
 Res = [ 0.7110272;   0.42318153; 0.5615672 ]; % residual
 
-% Test values from Qupath
-GreenBG = [0.683; 0.48; 0.55];
-Purple = [0.594; 0.665; 0.454];
-Brown = [0.499; 0.585; 0.639];
+HDABtoRGB = [He/norm(He) DAB/norm(DAB) Res/norm(Res)]';
+RGBtoHDAB = inv(HDABtoRGB);
 
-He = Purple;
-DAB = Brown;
-Res = GreenBG;
-
-tile_size = 12800; % How big a tile to read in at once - should be defined by available RAM;
+tile_size = 2048; % How big a tile to read in at once - trade-off between co-registration error and shearing;
 
 addpath(genpath('.'))
 
@@ -63,9 +59,15 @@ disp('Now loading in and doing colour demomposition in segments')
 total_loads = file_info(1).Width*file_info(1).Height/(tile_size^2);
 this_load = 0;
 proportion_done_prev = 0;
+if show_images
+    fig1 = figure();
+    set(fig1,'color','w');
+end
 for i = min_x_point:tile_size:max_x_point
     for j = min_y_point:tile_size:max_y_point
-        [i_2, j_2] = transformPointsInverse(tform,i,j);
+        [i_2, j_2] = transformPointsInverse(tform,round(i/sfactor),round(j/sfactor));
+        i_2 = i_2*sfactor;
+        j_2 = j_2*sfactor;
                 
         this_load = this_load+1;
         [ARGB] = openslide_read_region_autotrunkate(openslidePointer,i,j,tile_size,tile_size);
@@ -74,10 +76,22 @@ for i = min_x_point:tile_size:max_x_point
         [ARGB] = openslide_read_region_autotrunkate(openslidePointer_2,i_2,j_2,tile_size,tile_size);
         imageRGB_2 = cat(3,ARGB(:,:,2),ARGB(:,:,3),ARGB(:,:,4));
         
+        imageHDAB = SeparateStains(imageRGB, RGBtoHDAB);
+        imageHDAB_2 = SeparateStains(imageRGB_2, RGBtoHDAB);
         
-        
-        
-        
+        % % show images
+        if show_images
+            subplot(2,4,1); imshow(imageRGB); title('Original');
+            subplot(2,4,2); imshow(bwareaopen(imageHDAB(:,:,1)<0.4,100),[]); title('Purple');
+            subplot(2,4,3); imshow(bwareaopen(imageHDAB(:,:,2)<0.4,100),[]); title('Brown');
+            subplot(2,4,4); imshow(imageHDAB(:,:,3)<0.4,[]); title('Residual');
+            
+            subplot(2,4,5); imshow(imageRGB_2); title('Moved');
+            subplot(2,4,6); imshow(bwareaopen(imageHDAB_2(:,:,1)<0.4,100),[]); title('Purple');
+            subplot(2,4,7); imshow(bwareaopen(imageHDAB_2(:,:,2)<0.4,100),[]); title('Brown');
+            subplot(2,4,8); imshow(imageHDAB_2(:,:,3)<0.4,[]); title('Residual');
+            drawnow
+        end
         
         proportion_done = floor(this_load/total_loads*100);
         if proportion_done > proportion_done_prev
