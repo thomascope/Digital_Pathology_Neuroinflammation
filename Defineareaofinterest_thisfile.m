@@ -1,5 +1,10 @@
-thisfile = './AD/703424.svs'; %Base image
-thisfile_2 = './AD/703303.svs'; %Neighbouring image
+thisfile = 'F:/Brain paper slide scans/AD/703424.svs'; %Base image
+thisfile_2 = 'F:/Brain paper slide scans/AD/703303.svs'; %Neighbouring image
+
+[~,thisfile_name] = fileparts(thisfile);
+[~,thisfile_2_name] = fileparts(thisfile_2);
+
+desired_sfactor = 16; %Check you're loading the image level you think you are.
 
 addpath(genpath('.'))
 
@@ -35,6 +40,19 @@ downsampled_image = cat(3,ARGB(:,:,2),ARGB(:,:,3),ARGB(:,:,4));
 [ARGB] = openslide_read_region_autotrunkate(openslidePointer_2,1,1,inf,inf,'level',2);
 downsampled_image_2 = cat(3,ARGB(:,:,2),ARGB(:,:,3),ARGB(:,:,4));
 clear ARGB
+
+%Check scaling factors
+x_sfactor = round(file_info(1).Width/size(downsampled_image,2));
+y_sfactor = round(file_info(1).Height/size(downsampled_image,1));
+if x_sfactor == desired_sfactor
+    if x_sfactor == y_sfactor
+        sfactor = x_sfactor;
+    else
+        error('X and Y scale factors do not match for downsampled image')
+    end
+else
+    error('X scale factors does not match expected scale factor')
+end
 
 %Now create the Similarity based 2d transformation matrix between the two images
 tform = imregtform(rgb2gray(downsampled_image_2), rgb2gray(downsampled_image), 'similarity', optimizer, metric,'DisplayOptimization',false);
@@ -85,7 +103,7 @@ for i = 1:size(grain,2)
 end
 
 % Optionally show the raw image
-figure;
+staticfig = figure;
 imshow(downsampled_image);
 hold on;
 for i = 1:size(grain,2)
@@ -95,9 +113,10 @@ plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
 % plot(whitespace_polygon{i}{j})
 % end
 end
+saveas(staticfig,['./output_boundaries/' thisfile_name '.jpg'],'jpg');
 
 % Optionally show the moved image with boundary created from raw image
-figure;
+movedfig = figure;
 imshow(moved_image);
 hold on;
 for i = 1:size(grain,2)
@@ -107,6 +126,11 @@ plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
 % plot(whitespace_polygon{i}{j})
 % end
 end
+saveas(movedfig,['./output_boundaries/' thisfile_2_name '_moved.jpg'],'jpg');
+
+if numel(this_boundary) ~= 1
+    warning(['More than one boundary element found for slide ' thisfile ' please check the raw image')
+end    
 
 %Now remove white space areas from within sulci
 % Not implemented yet - would be more useful for double stained images, but

@@ -1,13 +1,12 @@
-thisfile = 'F:/Brain paper slide scans/2019-11-11/18-263 BA39 TAU CD68.svs';
+thisfile = 'NP18-263 7 BA39 Tau CD11c.svs';
 
 addpath(genpath('.'))
 
 openslide_load_library()
 openslidePointer = openslide_open(thisfile);
 
-[ARGB] = openslide_read_region_autotrunkate(openslidePointer,9200*4,3400*4,1000,1000);
+[ARGB] = openslide_read_region_autotrunkate(openslidePointer,22000,22000,1000,1000);
 imageRGB = cat(3,ARGB(:,:,2),ARGB(:,:,3),ARGB(:,:,4));
-file_info = imfinfo(thisfile);
 
 % set of standard values for stain vectors (from python scikit)
 % He = [0.65; 0.70; 0.29];
@@ -15,22 +14,18 @@ file_info = imfinfo(thisfile);
 % DAB = [0.27; 0.57; 0.78];
 
 % alternative set of standard values (HDAB from Fiji)
-% He = [ 0.6500286;  0.704031;    0.2860126 ];
-% DAB = [ 0.26814753;  0.57031375;  0.77642715];
-% Res = [ 0.7110272;   0.42318153; 0.5615672 ]; % residual
-% 
-% % Test values from Qupath
-% GreenBG = [0.683; 0.48; 0.55];
-% Purple = [0.594; 0.665; 0.454];
-% Brown = [0.499; 0.585; 0.639];
-% 
-% He = Purple;
-% DAB = Brown;
-% Res = GreenBG;
+He = [ 0.6500286;  0.704031;    0.2860126 ];
+DAB = [ 0.26814753;  0.57031375;  0.77642715];
+Res = [ 0.7110272;   0.42318153; 0.5615672 ]; % residual
 
-He = [0.599; 0.691; 0.405];
-DAB = [0.457; 0.599; 0.658 ];
-Res = [0.705; -0.695; 0.143];
+% Test values from Qupath
+GreenBG = [0.683; 0.48; 0.55];
+Purple = [0.594; 0.665; 0.454];
+Brown = [0.499; 0.585; 0.639];
+
+He = Purple;
+DAB = Brown;
+Res = GreenBG;
 
 % combine stain vectors to deconvolution matrix
 HDABtoRGB = [He/norm(He) DAB/norm(DAB) Res/norm(Res)]';
