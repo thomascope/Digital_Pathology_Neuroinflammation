@@ -1,4 +1,9 @@
-thisfile = 'F:/Brain paper slide scans/2019-11-11/18-263 BA39 TAU CD68.svs';
+thisfile = 'F:/Brain paper slide scans/2019-11-13/AH JR I BA7 CD68P.svs';
+thisfile = 'F:/Brain paper slide scans/2019-11-13/AH JR I BA7 TDP43P.svs';
+
+if ~exist(thisfile)
+   error(['The file ' thisfile ' does not exist - please check the path']) 
+end
 
 addpath(genpath('.'))
 
@@ -28,9 +33,9 @@ file_info = imfinfo(thisfile);
 % DAB = Brown;
 % Res = GreenBG;
 
-He = [0.599; 0.691; 0.405];
-DAB = [0.457; 0.599; 0.658 ];
-Res = [0.705; -0.695; 0.143];
+He = [0.625; 0.685; 0.374 ];
+DAB = [0.481; 0.603; 0.637  ];
+Res = [0.686; -0.711; 0.155];
 
 % combine stain vectors to deconvolution matrix
 HDABtoRGB = [He/norm(He) DAB/norm(DAB) Res/norm(Res)]';

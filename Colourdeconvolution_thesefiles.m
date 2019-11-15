@@ -76,8 +76,8 @@ for i = min_x_point:tile_size:max_x_point
         [ARGB] = openslide_read_region_autotrunkate(openslidePointer_2,i_2,j_2,tile_size,tile_size);
         imageRGB_2 = cat(3,ARGB(:,:,2),ARGB(:,:,3),ARGB(:,:,4));
         
-        imageHDAB = SeparateStains(imageRGB, RGBtoHDAB);
-        imageHDAB_2 = SeparateStains(imageRGB_2, RGBtoHDAB);
+        imageHDAB = SeparateStains_nonormalise(imageRGB, RGBtoHDAB);
+        imageHDAB_2 = SeparateStains_nonormalise(imageRGB_2, RGBtoHDAB);
         
         % % show images
         if show_images

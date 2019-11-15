@@ -1,4 +1,4 @@
-thisfile = 'NP18-263 7 BA39 Tau CD11c.svs';
+thisfile = 'F:/Brain paper slide scans/NP18-263 7 BA39 Tau CD11c.svs';
 
 addpath(genpath('.'))
 
