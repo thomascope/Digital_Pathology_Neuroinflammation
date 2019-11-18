@@ -8,6 +8,7 @@ all_files = [all_files; all_files2];
 all_files = struct2table(all_files);
 
 Demographics.pathology_type = cell(size(Demographics,1),1);
+Demographics.file_path = cell(size(Demographics,1),1);
 for i = 1:size(Regions,1)
     eval(['Demographics.' Regions.Region{i} '_path_fname = cell(size(Demographics,1),1);'])
     eval(['Demographics.' Regions.Region{i} '_infl_fname = cell(size(Demographics,1),1);'])
@@ -21,7 +22,7 @@ for i = 1:size(Demographics,1)
     elseif any(strfind(Demographics.Dx{i},'TDP'))
         Demographics.pathology_type{i} = 'TDP43';
     end
-    
+    Demographics.file_path(i) = all_files.folder(find(contains(all_files.name,Demographics.No_(i))&contains(all_files.name,Demographics.pathology_type(i)), 1, 'first'));
     for j = 1:size(Regions,1)
         path_file = all_files.name(find(contains(all_files.name,Demographics.No_(i))&contains(all_files.name,Demographics.pathology_type(i))&contains(all_files.name,Regions.Code{j})));
         if isempty(path_file)
