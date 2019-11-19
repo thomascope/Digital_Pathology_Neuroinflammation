@@ -3,6 +3,9 @@
 thisfile = 'F:/Brain paper slide scans/AD/703424.svs'; %Base image
 thisfile_2 = 'F:/Brain paper slide scans/AD/703303.svs'; %Neighbouring image
 
+thisfile = 'C:/Users/Thoma/Documents/Neuropath_neuroinflammation/AH JR I BA7 TDP43P.svs';
+thisfile_2 = 'C:/Users/Thoma/Documents/Neuropath_neuroinflammation/AH JR I BA7 CD68P.svs';
+
 [~,thisfile_name] = fileparts(thisfile);
 [~,thisfile_2_name] = fileparts(thisfile_2);
 
@@ -134,6 +137,9 @@ saveas(movedfig,['./output_boundaries/' thisfile_2_name '_moved.jpg'],'jpg');
 if numel(this_boundary) ~= 1
     warning(['More than one boundary element found for slide ' thisfile ' please check the raw image'])
 end    
+
+[~,fname] = fileparts(thisfile);
+save(['./output_boundaries/' fname],'tform','this_boundary','sfactor')
 
 %Now remove white space areas from within sulci
 % Not implemented yet - would be more useful for double stained images, but
